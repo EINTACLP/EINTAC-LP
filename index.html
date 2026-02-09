@@ -1,0 +1,41 @@
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('Investment Club')
+    .addItem('Update Stock Prices', 'updateStockPrices')
+    .addToUi();
+}
+
+function updateStockPrices() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Portfolio");
+  if (!sheet) return;
+
+  const tickers = sheet.getRange("A2:A").getValues().flat().filter(String);
+  if (tickers.length === 0) return;
+
+  // Use GOOGLEFINANCE for US stocks (free, reliable inside Google ecosystem)
+  tickers.forEach((ticker, index) => {
+    if (ticker) {
+      const row = index + 2;
+      const priceCell = sheet.getRange(row, 4); // Column D = Current Price
+      const valueCell = sheet.getRange(row, 5); // Column E = Value
+      const changeCell = sheet.getRange(row, 6); // Column F = % Change
+
+      try {
+        const price = SpreadsheetApp.getActiveSpreadsheet()
+          .getRange(`=GOOGLEFINANCE("${ticker}","price")`)
+          .getValue();
+        
+        const avgPrice = sheet.getRange(row, 3).getValue(); // Column C = Avg Price
+        const shares = sheet.getRange(row, 2).getValue(); // Column B = Shares
+        
+        if (price && shares) {
+          priceCell.setValue(price);
+          valueCell.setValue(price * shares);
+          if (avgPrice) changeCell.setValue(((price - avgPrice) / avgPrice) * 100);
+        }
+      } catch (e) {
+        priceCell.setValue("Error");
+      }
+    }
+  });
+}
