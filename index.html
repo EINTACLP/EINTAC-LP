@@ -45,14 +45,14 @@
   </div>
 
   <script>
-    const coins = [
+   const coins = [
     { name: "PaloAltoAI", symbol: "PALOAI", type: "crypto" },
     { name: "VeriProof", symbol: "VPF", type: "crypto" },
     { name: "SaylorBTC", symbol: "SBTC", type: "crypto" },
     { name: "Mark Zuckerberg Coin", symbol: "ZUCK", type: "crypto" },
     { name: "Solana", symbol: "SOL", type: "crypto" },
     { name: "Apple Inc.", symbol: "AAPL", type: "stock" },
-    // Add more of your coins here
+    // Add more here
   ];
 
   async function fetchPrice(symbol, type) {
@@ -105,7 +105,7 @@
   }
 
   updatePortfolio();
-  setInterval(updatePortfolio, 300000); // 5 min refresh
+  setInterval(updatePortfolio, 300000); // 5 min
   </script>
 </body>
 </html>
