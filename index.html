@@ -46,64 +46,66 @@
 
   <script>
     const coins = [
-      { name: "PaloAltoAI", symbol: "PALOAI", type: "crypto" },
-      { name: "VeriProof", symbol: "VPF", type: "crypto" },
-      { name: "SaylorBTC", symbol: "SBTC", type: "crypto" },
-      { name: "Solana", symbol: "SOL", type: "crypto" },
-      // Add your other coins here
-    ];
+    { name: "PaloAltoAI", symbol: "PALOAI", type: "crypto" },
+    { name: "VeriProof", symbol: "VPF", type: "crypto" },
+    { name: "SaylorBTC", symbol: "SBTC", type: "crypto" },
+    { name: "Mark Zuckerberg Coin", symbol: "ZUCK", type: "crypto" },
+    { name: "Solana", symbol: "SOL", type: "crypto" },
+    { name: "Apple Inc.", symbol: "AAPL", type: "stock" },
+    // Add more of your coins here
+  ];
 
-    async function fetchPrice(symbol, type) {
-      try {
-        if (type === "crypto") {
-          const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${symbol.toLowerCase()}&vs_currencies=usd&include_24hr_change=true`);
-          const data = await res.json();
-          const info = data[symbol.toLowerCase()];
-          if (info) {
-            return {
-              price: info.usd.toFixed(6),
-              change: info.usd_24h_change?.toFixed(2) || "N/A",
-              class: info.usd_24h_change > 0 ? "positive" : "negative"
-            };
-          }
-        } else if (type === "stock") {
-          const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d`);
-          const data = await res.json();
-          const quote = data.chart.result[0].meta;
-          if (quote) {
-            const change = ((quote.regularMarketPrice - quote.previousClose) / quote.previousClose * 100).toFixed(2);
-            return {
-              price: quote.regularMarketPrice.toFixed(2),
-              change,
-              class: change > 0 ? "positive" : "negative"
-            };
-          }
+  async function fetchPrice(symbol, type) {
+    try {
+      if (type === "crypto") {
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${symbol.toLowerCase()}&vs_currencies=usd&include_24hr_change=true`);
+        const data = await res.json();
+        const info = data[symbol.toLowerCase()];
+        if (info) {
+          return {
+            price: info.usd.toFixed(6),
+            change: info.usd_24h_change?.toFixed(2) || "N/A",
+            class: info.usd_24h_change > 0 ? "positive" : "negative"
+          };
         }
-      } catch (e) {
-        console.error(e);
+      } else if (type === "stock") {
+        const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d`);
+        const data = await res.json();
+        const quote = data.chart.result[0].meta;
+        if (quote) {
+          const change = ((quote.regularMarketPrice - quote.previousClose) / quote.previousClose * 100).toFixed(2);
+          return {
+            price: quote.regularMarketPrice.toFixed(2),
+            change,
+            class: change > 0 ? "positive" : "negative"
+          };
+        }
       }
-      return { price: "N/A", change: "N/A", class: "" };
+    } catch (e) {
+      console.error(e);
     }
+    return { price: "N/A", change: "N/A", class: "" };
+  }
 
-    async function updatePortfolio() {
-      const container = document.getElementById("portfolio");
-      container.innerHTML = "";
+  async function updatePortfolio() {
+    const container = document.getElementById("portfolio");
+    container.innerHTML = "";
 
-      for (const coin of coins) {
-        const data = await fetchPrice(coin.symbol, coin.type);
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <div class="ticker">\( {coin.name} ( \){coin.symbol})</div>
-          <div class="price">$${data.price}</div>
-          <div class="change \( {data.class}"> \){data.change}% (24h)</div>
-        `;
-        container.appendChild(card);
-      }
+    for (const coin of coins) {
+      const data = await fetchPrice(coin.symbol, coin.type);
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="ticker">\( {coin.name} ( \){coin.symbol})</div>
+        <div class="price">$${data.price}</div>
+        <div class="change \( {data.class}"> \){data.change}% (24h)</div>
+      `;
+      container.appendChild(card);
     }
+  }
 
-    updatePortfolio();
-    setInterval(updatePortfolio, 300000); // 5 min refresh
+  updatePortfolio();
+  setInterval(updatePortfolio, 300000); // 5 min refresh
   </script>
 </body>
 </html>
